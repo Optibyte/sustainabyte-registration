@@ -1,9 +1,8 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  // output: "export",
-  basePath: '/facility',
-  assetPrefix: '/facility/',
+// next.config.ts
+const nextConfig = {
+  basePath: "/facility",
+  assetPrefix: "/facility",
+  trailingSlash: false,
 };
 
-export default nextConfig;  
+export default nextConfig;
