@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       SMTP_PORT = "587",
       SMTP_USER,
       SMTP_PASS,
-      CONSULTATION_TARGET_EMAIL = "consultations@sustainabyte.com,programmer.rasla@gmail.com",
+      CONSULTATION_TARGET_EMAIL = "sadhir.m@sustainabyte.ai",
       CONSULTATION_FROM_EMAIL,
     } = process.env;
 
@@ -231,7 +231,7 @@ export async function POST(req: Request) {
               <div class="contact-title">Questions?</div>
               <div class="contact-text">
                 If you have any immediate questions or need to update your request, please contact us at:<br>
-                <strong>Email:</strong> consultations@sustainabyte.com<br>
+                <strong>Email:</strong> info@sustainabyte.ai<br>
                 <strong>Phone:</strong> Available during business hours
               </div>
             </div>
