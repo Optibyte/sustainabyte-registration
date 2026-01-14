@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  // output: "export",
   basePath: '/facility',
   assetPrefix: '/facility/',
 };
 
-export default nextConfig;
+export default nextConfig;  
