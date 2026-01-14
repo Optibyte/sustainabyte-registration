@@ -75,7 +75,7 @@ export default function Home() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/inquiry", {
+      const response = await fetch("/facility/api/inquiry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
