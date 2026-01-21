@@ -6,6 +6,9 @@ const nextConfig = {
   devIndicators: {
     buildActivity: false,
   },
+  experimental: {
+    turbo: true,
+  },
 };
 
 export default nextConfig;
