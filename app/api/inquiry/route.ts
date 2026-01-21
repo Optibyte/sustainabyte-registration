@@ -46,12 +46,44 @@ export async function POST(req: Request) {
       });
     }
 
+    // Send emails in background without blocking response
+    sendEmailsInBackground(data, {
+      SMTP_HOST,
+      SMTP_PORT,
+      SMTP_USER,
+      SMTP_PASS,
+      CONSULTATION_TARGET_EMAIL,
+      CONSULTATION_FROM_EMAIL,
+    }).catch((err) => {
+      console.error("Background email error:", err?.message || err);
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    const error = e as any;
+    console.error("Consultation error", error?.message || error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+async function sendEmailsInBackground(
+  data: ConsultationData,
+  config: {
+    SMTP_HOST: string;
+    SMTP_PORT: string;
+    SMTP_USER: string;
+    SMTP_PASS: string;
+    CONSULTATION_TARGET_EMAIL: string;
+    CONSULTATION_FROM_EMAIL?: string;
+  }
+) {
+  try {
     const nodemailer = await import("nodemailer");
     const transporter = nodemailer.default.createTransport({
-      host: SMTP_HOST,
-      port: Number(SMTP_PORT),
-      secure: Number(SMTP_PORT) === 465,
-      auth: { user: SMTP_USER, pass: SMTP_PASS },
+      host: config.SMTP_HOST,
+      port: Number(config.SMTP_PORT),
+      secure: Number(config.SMTP_PORT) === 465,
+      auth: { user: config.SMTP_USER, pass: config.SMTP_PASS },
     } as any);
 
     const subject = `New Consultation Request: ${data.company} - ${data.name}`;
@@ -251,35 +283,25 @@ export async function POST(req: Request) {
     `;
 
     await transporter.sendMail({
-      from: CONSULTATION_FROM_EMAIL || SMTP_USER,
-      to: CONSULTATION_TARGET_EMAIL,
+      from: config.CONSULTATION_FROM_EMAIL || config.SMTP_USER,
+      to: config.CONSULTATION_TARGET_EMAIL,
       subject,
       html: companyHtml,
     });
 
     await transporter.sendMail({
-      from: CONSULTATION_FROM_EMAIL || SMTP_USER,
+      from: config.CONSULTATION_FROM_EMAIL || config.SMTP_USER,
       to: data.email,
       subject: "Consultation Request Received - Sustainabyte",
       html: customerHtml,
     });
 
     transporter.close();
-
-    return NextResponse.json({ ok: true });
-  } catch (e) {
-    const error = e as any;
-    console.error("Consultation error", error?.message || error);
-    
-    // Return success even if email fails - prevents connection reset from breaking dev server
-    if (error?.code === 'ECONNRESET' || error?.code === 'ETIMEDOUT') {
-      console.warn("Email service temporarily unavailable - request recorded");
-      return NextResponse.json({ 
-        ok: true, 
-        warning: "Request recorded but email may not have been sent" 
-      });
+  } catch (err) {
+    const error = err as any;
+    if (error?.code !== 'ECONNRESET' && error?.code !== 'ETIMEDOUT') {
+      console.error("Email sending error:", error?.message || error);
     }
-    
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
